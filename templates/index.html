@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personalized Nutrition Advisor</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #2c3e50, #4ca1af);
+            color: #fff;
+            text-align: center;
+            padding: 20px;
+        }
+
+        h1 {
+            animation: fadeIn 2s;
+        }
+
+        form {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            display: inline-block;
+            margin: 20px auto;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        label {
+            font-weight: bold;
+        }
+
+        select, input {
+            margin: 10px 0;
+            padding: 10px;
+            width: 100%;
+            border-radius: 5px;
+            border: none;
+            outline: none;
+            font-size: 16px;
+            background: #34495e;
+            color: #fff;
+        }
+
+        button {
+            background: #e74c3c;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.3s;
+        }
+
+        button:hover {
+            background: #c0392b;
+        }
+
+        #recommendation {
+            margin-top: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 20px;
+            border-radius: 10px;
+            display: none;
+            animation: fadeIn 1s;
+        }
+
+        #recommendation p {
+            font-size: 18px;
+            line-height: 1.6;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <h1>Welcome to the Nutrition Advisor</h1>
+    <form id="nutritionForm">
+        <label for="age">Age:</label>
+        <input type="number" id="age" name="age" min="18" max="65" required><br>
+
+        <label for="weight">Weight (kg):</label>
+        <input type="number" id="weight" name="weight" min="40" max="150" required><br>
+
+        <label for="height">Height (cm):</label>
+        <input type="number" id="height" name="height" min="140" max="210" required><br>
+
+        <label for="activity_level">Activity Level:</label>
+        <select id="activity_level" name="activity_level" required>
+            <option value="1">Low</option>
+            <option value="2">Medium</option>
+            <option value="3">High</option>
+        </select><br>
+
+        <label for="health_goal">Health Goal:</label>
+        <select id="health_goal" name="health_goal" required>
+            <option value="Lose Weight">Lose Weight</option>
+            <option value="Gain Muscle">Gain Muscle</option>
+            <option value="Maintain Weight">Maintain Weight</option>
+        </select><br>
+
+        <button type="submit">Get Recommendation</button>
+    </form>
+
+    <div id="recommendation">
+        <h2>Your Recommendation</h2>
+        <p id="recommendationText"></p>
+        <p id="recommendationDetails"></p>
+    </div>
+
+    <script>
+        const recommendationDetails = {
+            "Low Carb": "A low-carb diet focuses on reducing carbohydrate intake, replacing it with proteins and healthy fats. It's great for weight loss and controlling blood sugar levels.",
+            "High Protein": "A high-protein diet is ideal for muscle growth and repair. It includes foods like lean meats, dairy, and legumes.",
+            "Balanced": "A balanced diet ensures you get the right proportions of carbohydrates, proteins, fats, vitamins, and minerals for overall health.",
+            "Low Fat": "A low-fat diet minimizes fat intake, focusing on fruits, vegetables, and lean proteins. It's suitable for heart health and weight management."
+        };
+
+        document.getElementById('nutritionForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+
+            const formData = {
+                age: document.getElementById('age').value,
+                weight: document.getElementById('weight').value,
+                height: document.getElementById('height').value,
+                activity_level: document.getElementById('activity_level').value,
+                health_goal: document.getElementById('health_goal').value
+            };
+
+            try {
+                const response = await fetch('/recommend', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                const result = await response.json();
+                const recommendationDiv = document.getElementById('recommendation');
+                const recommendationText = document.getElementById('recommendationText');
+                const recommendationDetailsText = document.getElementById('recommendationDetails');
+
+                const recommendation = result.recommendation || 'No recommendation received.';
+                recommendationText.textContent = recommendation;
+                recommendationDetailsText.textContent = recommendationDetails[recommendation] || '';
+                recommendationDiv.style.display = 'block';
+            } catch (error) {
+                console.error('Error:', error);
+                alert('An error occurred while fetching the recommendation. Please try again.');
+            }
+        });
+    </script>
+</body>
+</html>
